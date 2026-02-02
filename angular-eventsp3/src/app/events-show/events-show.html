@@ -1,0 +1,40 @@
+<nav class="navbar navbar-light bg-light justify-content-between mt-3">
+  <ul class="nav nav-pills">
+    <li class="nav-item">
+      <a class="nav-link" href="#" (click)="orderDate() ">Orden por fecha</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#" (click)="orderPrice() ">Orden por precio</a>
+    </li>
+  </ul>
+  <form class="form-inline">
+    <input
+      class="form-control mr-sm-2"
+      type="text"
+      [(ngModel)]="search"
+      name="search"
+      placeholder="Search"
+      aria-label="Search"
+    />
+    <p>{{ search }}</p>
+  </form>
+</nav>
+<div class="row">
+  @if (events && events.length > 0) {
+    @for (event of events | eventFilter: search; track event.title) {
+      <div class="col-6 mt-4">
+        <!-- Repetir esto por cada evento -->
+        
+        <app-evento-item
+          class="card"
+          [evento]="event"
+          (deleteEv)="deleteEvent(event)">
+        </app-evento-item>
+      
+      </div>
+    }
+  } @else {
+    <h1>No hay nada que mostrar</h1>
+  }
+</div>
+<app-evento-add (addEv)="addEvent($event)"></app-evento-add>
