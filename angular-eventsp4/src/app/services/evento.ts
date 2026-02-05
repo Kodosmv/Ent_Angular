@@ -1,30 +1,40 @@
 import { Injectable } from '@angular/core';
 import { IEvent } from '../../interfaces/i-event';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { catchError, Observable, throwError } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EventoService {
-
-  
-  getEventos(): IEvent[] {
-    return [
-      {
-        title: 'foto uno',
-        image: 'img1.jpg',
-        date: '2004-05-08',
-        description: 'noseque',
-        price: 21,
-      },
-      {
-        title: 'Prueba dos',
-        image: 'img2.jpg',
-        date: '2009-05-08',
-        description: 'siiii',
-        price: 5,
-      },
-      
-    ];
+  private productsEndpoint = 'http://localhost:3000/eventos';
+  constructor(private http: HttpClient) {}
+  getEventos(): Observable<IEvent[]> {
+    return this.http.get<IEvent[]>(this.productsEndpoint).pipe(
+      catchError((resp: HttpErrorResponse) =>
+        throwError(
+          () =>
+            new Error(
+              ` Error obteniendo productos. Código de servidor: ${resp.status}.
+              Mensaje: ${resp.message}`,
+            ),
+        ),
+      ),
+    );
   }
-
+  addEvento( evento: IEvent): Observable<IEvent>{ 
+    return this.http
+      .post<IEvent>(this.productsEndpoint, evento)
+      .pipe(
+        catchError((resp: HttpErrorResponse)=>
+        throwError(
+          () =>
+            new Error(
+              `Error crear producto. Código de servidor: ${resp.status}. Mensaje:
+              ${resp.message}`,
+            ),
+          ),
+        ),
+      );
+  }
 }

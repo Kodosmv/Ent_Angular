@@ -20,7 +20,7 @@
   </form>
 </nav>
 <div class="row">
-  @if (events && events.length > 0) {
+  @if (events$ | async; as events) {
     @for (event of events | eventFilter: search; track event.title) {
       <div class="col-6 mt-4">
         <!-- Repetir esto por cada evento -->
