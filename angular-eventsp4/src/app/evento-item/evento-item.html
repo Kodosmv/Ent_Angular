@@ -1,4 +1,4 @@
-<img class="card-img-top" [src]="evento.image" />
+<img class="card-img-top" [src]="evento.image" [alt]="evento.title" />
 
 <div class="card-body">
   <h4 class="card-title">{{ evento.title | titlecase }}</h4>
@@ -6,7 +6,7 @@
 
   <div class="text-end">
     <button
-      class="btn btn-danger ml-3"
+      class="btn btn-danger"
       (click)="deleteEvento()">
       Borrar
     </button>
@@ -14,6 +14,6 @@
 </div>
 
 <div class="card-footer text-muted d-flex justify-content-around">
-  {{ evento.date | date:'dd/MM/y' }}
-  <span>{{ evento.price | currency:'EUR' }}</span>
+  <span>{{ evento.date | date:'dd/MM/yyyy' }}</span>
+  <span>{{ evento.price | currency:'EUR':'symbol':'1.2-2' }}</span>
 </div>

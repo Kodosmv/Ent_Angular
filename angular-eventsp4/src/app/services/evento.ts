@@ -7,34 +7,31 @@ import { catchError, Observable, throwError } from 'rxjs';
   providedIn: 'root',
 })
 export class EventoService {
-  private productsEndpoint = 'http://localhost:3000/eventos';
+  private eventsEndpoint = 'http://localhost:3000/eventos';
+
   constructor(private http: HttpClient) {}
+
   getEventos(): Observable<IEvent[]> {
-    return this.http.get<IEvent[]>(this.productsEndpoint).pipe(
+    return this.http.get<IEvent[]>(this.eventsEndpoint).pipe(
       catchError((resp: HttpErrorResponse) =>
-        throwError(
-          () =>
-            new Error(
-              ` Error obteniendo productos. Código de servidor: ${resp.status}.
-              Mensaje: ${resp.message}`,
-            ),
-        ),
-      ),
+        throwError(() => new Error(`Error: ${resp.status}`))
+      )
     );
   }
-  addEvento( evento: IEvent): Observable<IEvent>{ 
-    return this.http
-      .post<IEvent>(this.productsEndpoint, evento)
-      .pipe(
-        catchError((resp: HttpErrorResponse)=>
-        throwError(
-          () =>
-            new Error(
-              `Error crear producto. Código de servidor: ${resp.status}. Mensaje:
-              ${resp.message}`,
-            ),
-          ),
-        ),
-      );
+
+  addEvento(evento: IEvent): Observable<IEvent> {
+    return this.http.post<IEvent>(this.eventsEndpoint, evento).pipe(
+      catchError((resp: HttpErrorResponse) =>
+        throwError(() => new Error(`Error: ${resp.status}`))
+      )
+    );
+  }
+
+  deleteEvento(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.eventsEndpoint}/${id}`).pipe(
+      catchError((resp: HttpErrorResponse) =>
+        throwError(() => new Error(`Error: ${resp.status}`))
+      )
+    );
   }
 }

@@ -3,12 +3,20 @@ import { IEvent } from '../../interfaces/i-event';
 
 @Pipe({
   name: 'eventFilter',
+  standalone: true,
+  pure: false 
 })
 export class EventFilterPipe implements PipeTransform {
-  transform(events: IEvent[], searchTerm: string): IEvent[] {
-    //const filter = searchTerm ? searchTerm.toLocaleLowerCase() : null;
-    if (!events || !searchTerm) return events;
-    searchTerm = searchTerm.toLocaleLowerCase();
-    return events.filter((eve) => eve.title.toLocaleLowerCase().includes(searchTerm));
+  transform(events: IEvent[] | null, searchTerm: string): IEvent[] {
+    if (!events) return [];
+    if (!searchTerm || typeof searchTerm !== 'string' || searchTerm.trim() === '') {
+      return events;
+    }
+
+    const term = searchTerm.toLowerCase().trim();
+    return events.filter(e => 
+      e.title.toLowerCase().includes(term) || 
+      e.description.toLowerCase().includes(term)
+    );
   }
 }

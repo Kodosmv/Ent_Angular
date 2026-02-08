@@ -1,46 +1,57 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { IEvent } from '../../interfaces/i-event';
+import { EventoService } from '../services/evento';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventFilterPipe } from '../pipes/event-filter-pipe';
-import { EventoItem } from '../evento-item/evento-item';
-import { EventoAdd } from '../evento-add/evento-add';
-import { EventoService } from '../services/evento';
-import { Observable } from 'rxjs';
+import { EventoItem } from '../evento-item/evento-item'; // <--- MIRA SI ESTO ESTÁ BIEN
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-events-show',
-  imports: [FormsModule, EventFilterPipe, EventoItem, EventoAdd, CommonModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule, EventFilterPipe, EventoItem, RouterModule],
   templateUrl: './events-show.html',
-  styleUrl: './events-show.css',
 })
-export class EventsShow {
-  orderPrice() {
-    this.search = '';
-    this.events = this.events.sort((a, b) => {
-      return a.price - b.price;
-    });
-  }
-  orderDate() {
-    this.search = '';
-    this.events = this.events.sort((a, b) => {
-      const dA = new Date(a.date);
-      const dB = new Date(b.date);
-      return dA.getTime() - dB.getTime();
-    });
-  }
-  search = '';
+export class EventsShow implements OnInit {
   events: IEvent[] = [];
-  //? mirar si va
-  events$: Observable<IEvent[]>;
-  constructor(private eventoService: EventoService) {
-    this.events$ = this.eventoService.getEventos();
+  search: string = '';
+
+  constructor(
+    private eventoService: EventoService,
+    private cd: ChangeDetectorRef  // ni idea de perq falla si no esta 
+  ) {}
+
+  ngOnInit(): void {
+    this.cargarEventos();
   }
 
-  deleteEvent(eventoBorrar: IEvent): void {
-    this.events = this.events.filter((evento) => evento !== eventoBorrar);
+  cargarEventos() {
+    this.eventoService.getEventos().subscribe({
+      next: (data) => {
+        console.log('Recibidos:', data);
+        this.events = data; 
+        this.search = '';
+        this.cd.detectChanges();  
+      },
+      error: (err) => {
+        console.error('Error al conectar con el servidor:', err);
+      }
+    });
   }
-  /* addEvent(evento: IEvent): void {
-    this.events = [...this.events, evento];
-  } */
+
+  deleteEvent(id: string): void {
+    
+    this.events = this.events.filter(e => e.id !== id);
+  }
+
+  orderPrice() {
+    this.events = [...this.events.sort((a, b) => 
+      a.price - b.price)];
+  }
+
+  orderDate() {
+    this.events = [...this.events.sort((a, b) => 
+      new Date(a.date).getTime() - new Date(b.date).getTime())];
+  }
 }

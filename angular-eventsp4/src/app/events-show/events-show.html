@@ -1,40 +1,46 @@
-<nav class="navbar navbar-light bg-light justify-content-between mt-3">
+<nav class="navbar navbar-light bg-light justify-content-between mt-3 px-3">
   <ul class="nav nav-pills">
     <li class="nav-item">
-      <a class="nav-link" href="#" (click)="orderDate() ">Orden por fecha</a>
+      <a class="nav-link" href="#" (click)="orderDate(); $event.preventDefault()">Orden por fecha</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="#" (click)="orderPrice() ">Orden por precio</a>
+      <a class="nav-link" href="#" (click)="orderPrice(); $event.preventDefault()">Orden por precio</a>
     </li>
   </ul>
+
   <form class="form-inline">
     <input
       class="form-control mr-sm-2"
       type="text"
       [(ngModel)]="search"
       name="search"
-      placeholder="Search"
+      placeholder="Buscar eventos..."
       aria-label="Search"
     />
-    <p>{{ search }}</p>
   </form>
 </nav>
+
+<div class="mt-4 mb-2">
+  <a class="btn btn-primary shadow-sm" [routerLink]="['/eventos/add']">
+    <i class="bi bi-plus-lg"></i> Nuevo Evento
+  </a>
+</div>
+
 <div class="row">
-  @if (events$ | async; as events) {
-    @for (event of events | eventFilter: search; track event.title) {
-      <div class="col-6 mt-4">
-        <!-- Repetir esto por cada evento -->
+  @for (event of events | eventFilter: search; track event.id) {
+    <div class="col-md-6 col-lg-4 mt-4">
+      <app-evento-item
+        class="card h-100 shadow-sm"
+        [evento]="event"
+        (deleteEv)="deleteEvent($event)">
+      </app-evento-item>
+    </div>
+  } @empty {
+    <div class="col-12 mt-5 text-center">
+      <div class="alert alert-info">
+        <h3>No se han encontrado eventos</h3>
         
-        <app-evento-item
-          class="card"
-          [evento]="event"
-          (deleteEv)="deleteEvent(event)">
-        </app-evento-item>
-      
       </div>
-    }
-  } @else {
-    <h1>No hay nada que mostrar</h1>
+    </div>
   }
 </div>
-<app-evento-add (addEv)="addEvent($event)"></app-evento-add>

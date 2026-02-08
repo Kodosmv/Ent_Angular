@@ -1,21 +1,23 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CurrencyPipe, DatePipe, TitleCasePipe } from '@angular/common';
-import { IEvent } from '../../interfaces/i-event'
+import { IEvent } from '../../interfaces/i-event';
+import { CurrencyPipe, DatePipe, TitleCasePipe, CommonModule } from '@angular/common';
+import { EventoService } from '../services/evento';
 
 @Component({
   selector: 'app-evento-item',
-  imports: [DatePipe, CurrencyPipe, TitleCasePipe],
+  standalone: true,
+  imports: [CommonModule, DatePipe, CurrencyPipe, TitleCasePipe],
   templateUrl: './evento-item.html',
-  styleUrl: './evento-item.css',
 })
 export class EventoItem {
-
-  
   @Input() evento!: IEvent;
-  @Output() deleteEv = new EventEmitter<void>();
+  @Output() deleteEv = new EventEmitter<string>();
+
+  constructor(private eventoService: EventoService) {}
 
   deleteEvento() {
-    this.deleteEv.emit();
+    this.eventoService.deleteEvento(this.evento.id!).subscribe(() => {
+      this.deleteEv.emit(this.evento.id!);
+    });
   }
-  
 }
